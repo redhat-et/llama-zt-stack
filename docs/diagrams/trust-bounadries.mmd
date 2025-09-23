@@ -1,0 +1,37 @@
+flowchart LR
+    subgraph User
+      C[Client / Agent]
+    end
+
+    subgraph Gateway
+      LLS[Llama Stack]
+    end
+
+    subgraph Providers
+      O[Ollama Inference]
+      T1[MCP Tool A]
+      T2[MCP Tool B]
+    end
+
+    subgraph Auth
+      K[Keycloak]
+    end
+
+    C -->|Token A| LLS
+    LLS -->|Validate Token A| K
+
+    %% Current (broken)
+    LLS -. Pass-through Token A .-> T1
+    LLS -. Static API Key .-> T2
+
+    %% Desired ZT
+    LLS -->|Delegated Token B| O
+    LLS -->|Delegated Token B + Attestation| T1
+    LLS -->|Delegated Token B + Attestation| T2
+
+    style LLS fill:#fdf6e3,stroke:#657b83,stroke-width:2px
+    style C fill:#eee8d5,stroke:#586e75
+    style O fill:#e0f7fa,stroke:#006064
+    style T1 fill:#f1f8e9,stroke:#33691e
+    style T2 fill:#f1f8e9,stroke:#33691e
+    style K fill:#ede7f6,stroke:#4527a0

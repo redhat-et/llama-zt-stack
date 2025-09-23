@@ -1,0 +1,12 @@
+sequenceDiagram
+    participant Client
+    participant LlamaStack
+    participant MCPTool
+    participant MCPAuth
+
+    Client->>LlamaStack: Request + Token A (Keycloak)
+    LlamaStack->>MCPTool: Forward Token A
+    MCPTool->>MCPAuth: Validate with separate auth server
+    MCPAuth-->>MCPTool: Token valid (in its own scope)
+    MCPTool-->>LlamaStack: Executes with fragmented trust
+    LlamaStack-->>Client: Response

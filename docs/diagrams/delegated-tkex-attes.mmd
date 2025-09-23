@@ -1,0 +1,21 @@
+sequenceDiagram
+    participant Client
+    participant LlamaStack
+    participant MCPTool
+    participant Keycloak
+    participant Attestor
+
+    Client->>LlamaStack: Request + Token A
+    LlamaStack->>Keycloak: Validate Token A
+    Keycloak-->>LlamaStack: Token valid
+
+    Note over LlamaStack,MCPTool: Delegated Token Exchange + Attestation
+    LlamaStack->>Keycloak: Exchange Token A → Token B (scoped, short-lived)
+    Keycloak-->>LlamaStack: Token B
+
+    LlamaStack->>Attestor: Verify MCPTool workload state
+    Attestor-->>LlamaStack: Attestation OK
+
+    LlamaStack->>MCPTool: Call with Token B (scoped + attested)
+    MCPTool-->>LlamaStack: Executes with least privilege
+    LlamaStack-->>Client: Response
