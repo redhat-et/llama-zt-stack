@@ -1,37 +1,44 @@
 flowchart LR
     subgraph User
-      C[Client / Agent]
+      C["Client / Agent"]
     end
 
-    subgraph Gateway
-      LLS[Llama Stack]
+    subgraph LLS["Llama Stack (Orchestrator + Thin Enforcement)"]
+      LlamaStack
     end
 
-    subgraph Providers
-      O[Ollama Inference]
-      T1[MCP Tool A]
-      T2[MCP Tool B]
+    subgraph Providers["Execution Environment"]
+      O["Ollama Inference Provider"]
+      T1["MCP Tool A"]
+      T2["MCP Tool B"]
     end
 
-    subgraph Auth
-      K[Keycloak]
+    subgraph Policy["External Policy & Identity"]
+      K["Keycloak (OIDC)"]
+      P["Policy Engine (ABAC/CBAC)"]
+      A["Attestor (SPIRE/Sigstore)"]
     end
 
-    C -->|Token A| LLS
-    LLS -->|Validate Token A| K
+    %% Flow
+    C -->|"Token A"| LlamaStack
+    LlamaStack -->|"Validate Token A"| K
+    LlamaStack -->|"Enforce ABAC Rules"| P
 
-    %% Current (broken)
-    LLS -. Pass-through Token A .-> T1
-    LLS -. Static API Key .-> T2
+    %% Current weak paths
+    LlamaStack -. "Forward Token A" .-> T1
+    LlamaStack -. "Static API Key" .-> T2
 
-    %% Desired ZT
-    LLS -->|Delegated Token B| O
-    LLS -->|Delegated Token B + Attestation| T1
-    LLS -->|Delegated Token B + Attestation| T2
+    %% ZT-improved paths (separate tokens)
+    LlamaStack -->|"Token B1 (Ollama)"| O
+    LlamaStack -->|"Token B2 (scoped + attested)"| T1
+    LlamaStack -->|"Token B3 (scoped + attested)"| T2
+    LlamaStack -->|"Verify Workload State"| A
 
-    style LLS fill:#fdf6e3,stroke:#657b83,stroke-width:2px
+    style LlamaStack fill:#fdf6e3,stroke:#657b83,stroke-width:2px
     style C fill:#eee8d5,stroke:#586e75
     style O fill:#e0f7fa,stroke:#006064
     style T1 fill:#f1f8e9,stroke:#33691e
     style T2 fill:#f1f8e9,stroke:#33691e
     style K fill:#ede7f6,stroke:#4527a0
+    style P fill:#f3e5f5,stroke:#6a1b9a
+    style A fill:#fff9c4,stroke:#f57f17

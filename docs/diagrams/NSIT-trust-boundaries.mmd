@@ -1,0 +1,11 @@
+flowchart LR
+    A["Client (A)"]
+    B["Orchestrator (B) – Llama Stack"]
+    C["Backend Tool (C) – MCP"]
+
+    %% Explicit hops
+    A -->|"Token A"| B
+    B -->|"Call"| C
+
+    %% Implicit trust
+    A -.->|"Implicit Trust"| C

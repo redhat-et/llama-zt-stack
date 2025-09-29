@@ -1,0 +1,15 @@
+flowchart LR
+    A["Client (A)"]
+    B["Orchestrator (B) – Llama Stack"]
+    C["Backend Tool (C) – MCP"]
+    K["Keycloak"]
+
+    %% Token exchange and validation
+    A -->|"Token A"| B
+    B -->|"Validate Token A"| K
+    B -->|"Exchange A→B1"| K
+    K -->|"Token B1 (scoped)"| B
+    B -->|"Token B1"| C
+
+    %% Explicit trust
+    A -->|"Assured via Delegation + Policy"| C
