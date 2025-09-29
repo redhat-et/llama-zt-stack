@@ -1,0 +1,16 @@
+sequenceDiagram
+    participant Client
+    participant MCPServer
+    participant AuthServer
+
+    Client->>MCPServer: GET /.well-known/oauth-protected-resource
+    MCPServer-->>Client: scopes_supported [current, forecast]
+
+    Client->>AuthServer: Request token (scope=weather:current)
+    AuthServer-->>Client: JWT { scope=weather:current }
+
+    Client->>MCPServer: GET /tools/current (Bearer token)
+    MCPServer-->>Client: ✅ Weather data
+
+    Client->>MCPServer: GET /tools/forecast (Bearer token)
+    MCPServer-->>Client: ❌ 403 Insufficient scope
